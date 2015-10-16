@@ -1,0 +1,26 @@
+{
+  "name": "qos",
+  "version": "0.0.1",
+  "description": "Safe, fast and super simple queue and schedule based on Redis.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xpepermint/qos.git"
+  },
+  "keywords": [
+    "queue",
+    "que",
+    "schedule",
+    "scheduler",
+    "redis"
+  ],
+  "author": "Xpepermint",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xpepermint/qos/issues"
+  },
+  "homepage": "https://github.com/xpepermint/qos#readme"
+}
