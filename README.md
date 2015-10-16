@@ -3,6 +3,7 @@
 > Safe, fast and super simple queue and schedule based on Redis.
 
 QoS (Queue or Schedule) offers a simple api for scheduling and running tasks in background. QoS is build on top of [Redis](http://redis.io). It's super fast and it uses atomic commands to ensure safe job execution in cluster environments.
+
 <img src="giphy.gif" width="150"/>
 
 ## Setup
@@ -17,7 +18,7 @@ Before we start playing, please note that this package requires `node v4.2.0` or
 
 ### Queue
 
-Let's start by creating a `job` file `./MyJob.js`. The module returns a function which returns a promise.
+Let's start by creating a `job` file `./MyJob.js`. A job module must return a function which returns a promise.
 
 ```js
 module.exports = function(arg) {
@@ -26,7 +27,7 @@ module.exports = function(arg) {
 };
 ```
 
-Create a new file `./index.js` and write a simple queue. We need to pass an instance of a redis connection to the `Queue` class. This package should work with any Redis library which supports promises. We'll use the [ioredis](https://github.com/luin/ioredis) package which looks awesome.
+Create a new file `./index.js` and write a simple queue. We need to pass an instance of a redis connection to the `Queue` class. This package should work with any Redis library which supports promises. We'll use an awesome [ioredis](https://github.com/luin/ioredis) package.
 
 ```js
 'use strict';
@@ -43,7 +44,7 @@ const queue = new qos.Queue(redis, 'myqueue');
 queue.start();
 ```
 
-Now we are ready to enqueue a job using the `enqueue` command.
+Now we are ready to enqueue a job using the `enqueue` command. The job execution will start immediately.
 
 ```js
 const path = require('path');
