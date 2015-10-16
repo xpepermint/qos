@@ -4,6 +4,7 @@
   "description": "Safe, fast and super simple queue and schedule based on Redis.",
   "main": "index.js",
   "scripts": {
+    "example": "node --harmony --harmony-destructuring example/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/xpepermint/qos/issues"
   },
-  "homepage": "https://github.com/xpepermint/qos#readme"
+  "homepage": "https://github.com/xpepermint/qos#readme",
+  "devDependencies": {
+    "ioredis": "^1.9.1"
+  }
 }
