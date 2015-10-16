@@ -19,7 +19,3 @@ let jobPath = path.join(__dirname, 'jobs/Job');
 schedule.enqueue({queue, at: Date.now()+10000, path: jobPath, args: [Date.now()]});
 // run job now
 queue.enqueue({path: jobPath, args: [Date.now()]});
-queue.enqueue({path: jobPath, args: [Date.now()]});
-queue.enqueue({path: jobPath, args: [Date.now()]});
-queue.enqueue({path: jobPath, args: [Date.now()]});
-queue.enqueue({path: jobPath, args: [Date.now()]});
