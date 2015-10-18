@@ -64,14 +64,26 @@ queue.dequeue({
 });
 ```
 
+We usually place job files in the same directory. Building a job path over and over again soon gets pretty annoying. Queue will look for jobs inside application's working directory by default (`process.cwd()`). We can specify additional resolve paths by passing the `paths` options.
+
+```js
+const paths = [__dirname, `${__dirname}/jobs`]; // list of paths where jobs can exist
+const queue = new qos.Queue(redis, 'myqueue', {paths});
+
+queue.enqueue({
+  path: "MyJob", // just file name
+  args: ['argument1']
+});
+```
+
 ### Schedule
 
-To schedule a job at particular time in the future we need to use the `Schedule` class. `Schedule` is an extended `Queue` class with pretty much the same logic. The only difference is that we need to provide some additional information for the `enqueue` command.
+To schedule a job at particular time in the future we need to use the `Schedule` class. `Schedule` is an extended `Queue` class. It accepts the same attributes and has pretty much the same logic. The only difference is that we need to provide some additional information for the `enqueue` command.
 
 Let's open our `./index.js` file which we defined earlier and define our scheduler queue.
 
 ```js
-const schedule = new qos.Schedule(redis, 'myschedule');
+const schedule = new qos.Schedule(redis, 'myschedule'); // same options apply
 
 schedule.start();
 ```

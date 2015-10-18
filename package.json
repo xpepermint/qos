@@ -1,6 +1,6 @@
 {
   "name": "qos",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Safe, fast and super simple queue and schedule based on Redis.",
   "main": "index.js",
   "scripts": {
@@ -16,6 +16,11 @@
     "que",
     "schedule",
     "scheduler",
+    "task",
+    "tasks",
+    "job",
+    "jobs",
+    "background",
     "redis"
   ],
   "author": "Xpepermint",
