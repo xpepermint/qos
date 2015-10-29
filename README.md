@@ -78,9 +78,9 @@ queue.enqueue({
 
 ### Schedule
 
-To schedule a job at particular time in the future we need to use the `Schedule` class. `Schedule` is an extended `Queue` class. It accepts the same attributes and has pretty much the same logic. The only difference is that we need to provide some additional information for the `enqueue` command.
+To schedule a job at particular time in the future we need to use the `Schedule` class. `Schedule` is an extended `Queue` class. It accepts the same attributes and has pretty much the same logic. The only difference is that we need to provide some additional information for the `enqueue` and `dequeue` commands.
 
-Let's open our `./index.js` file which we defined earlier and define our scheduler queue.
+Let's open our `./index.js` file which we defined earlier and add our scheduler queue.
 
 ```js
 const schedule = new qos.Schedule(redis, 'myschedule'); // same options apply
@@ -88,12 +88,24 @@ const schedule = new qos.Schedule(redis, 'myschedule'); // same options apply
 schedule.start();
 ```
 
-Schedule our `MyJob` with the delay of 10s.
+Schedule the `MyJob` with the delay of 10s.
 
 ```js
 schedule.enqueue({
+  path: path.join(__dirname, 'MyJob'),
+  args: ['argument1', 'argument2'],
   queue, // you can also pass queue name ('myqueue')
-  at: Date.now() + 10000,
+  at: Date.now() + 10000
+});
+```
+
+There is one important different between `Queue` and `Schedule` classes. If we call the command above multiple times, an existing job will always be replaced with a new one. This means that two identical jobs can not exist in scheduled queue. This is great and ensures that the same job will never be accidentally scheduled twice.
+
+Scheduled jobs can also be removed.
+
+```js
+schedule.dequeue({
+  queue,
   path: path.join(__dirname, 'MyJob'),
   args: ['argument1', 'argument2']
 });
