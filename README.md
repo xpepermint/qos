@@ -64,7 +64,16 @@ queue.dequeue({
 });
 ```
 
-We usually place job files in the same directory. Building a job path over and over again soon gets pretty annoying. Queue will look for jobs inside application's working directory by default (`process.cwd()`). We can specify additional resolve paths by passing the `paths` options.
+Jobs can also be executed without touching the queuing system using the `perform` method.
+
+```js
+queue.perform({
+  path: path.join(__dirname, 'MyJob'),
+  args: ['argument1']
+});
+```
+
+I bet you'll put your jobs in one place. Building a job path over and over again soon gets pretty annoying. Queue will look for jobs inside application's working directory by default (`process.cwd()`). We can override the that by passing the `paths` options.
 
 ```js
 let paths = [__dirname, `${__dirname}/jobs`]; // list of paths where jobs can exist
