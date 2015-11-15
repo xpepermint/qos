@@ -62,7 +62,7 @@ class Queue {
   */
 
   handleError(err) {
-    if (!(err instanceof QueueEmptyError)) console.log(err);
+    if (!(err.name === 'QueueEmptyError')) console.log(err);
 
     clearTimeout(this.timeout);
     this.timeout = setTimeout(this.tick.bind(this), 1000);

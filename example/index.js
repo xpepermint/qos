@@ -1,25 +1,25 @@
 'use strict';
 
-const Redis = require('ioredis');
-const redis = new Redis();
-const qos = require('..');
+var Redis = require('ioredis');
+var redis = new Redis();
+var qos = require('..');
 
 // where to look for jobs
-let paths = [__dirname];
+var paths = [__dirname];
 // fake context to which a job has access through `this` keyword
-let ctx = new function() { this.foo = 'bar' }
+var ctx = new function() { this.foo = 'bar' }
 // default arguments
-let args = [ctx];
+var args = [ctx];
 
 // initializing queue
-let queue = new qos.Queue(redis, 'qos:queue', {paths, ctx, args});
+var queue = new qos.Queue(redis, 'qos:queue', {paths, ctx, args});
 // starting queue
 queue.start();
 // run job now
 queue.enqueue({path: 'jobs/MyJob', args: [Date.now()]});
 
 // initializing schedule
-let schedule = new qos.Schedule(redis, 'qos:schedule');
+var schedule = new qos.Schedule(redis, 'qos:schedule');
 // starting schedule queue
 schedule.start();
 // delay job for 10s
