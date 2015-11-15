@@ -1,6 +1,6 @@
 {
   "name": "qos",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Safe, fast and super simple queue and schedule based on Redis.",
   "main": "index.js",
   "scripts": {
@@ -30,9 +30,6 @@
   },
   "homepage": "https://github.com/xpepermint/qos#readme",
   "devDependencies": {
-    "ioredis": "^1.9.1"
-  },
-  "dependencies": {
     "ioredis": "^1.10.0"
   }
 }
