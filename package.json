@@ -1,6 +1,6 @@
 {
   "name": "qos",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Safe, fast and super simple queue and schedule based on Redis.",
   "main": "dist/index.js",
   "scripts": {
