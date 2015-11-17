@@ -46,6 +46,17 @@ class Schedule extends Queue {
     let value = JSON.stringify({key, value: this.encodeValue(data)});
     return this.redis.zrem(this.key, value);
   }
+
+  /*
+  * Tells if the job is scheduled.
+  */
+
+  isEnqueued(data) {
+    let at = data.at || Date.now();
+    let key = typeof data.queue === 'string' ? data.queue : data.queue.key;
+    let value = JSON.stringify({key, value: this.encodeValue(data)});
+    return this.redis.zscore(this.key, value).then(res => !!res);
+  }
 }
 
 module.exports = Schedule;

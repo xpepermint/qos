@@ -1,12 +1,12 @@
 {
   "name": "qos",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Safe, fast and super simple queue and schedule based on Redis.",
   "main": "dist/index.js",
   "scripts": {
     "build": "babel src --out-dir dist",
     "prepublish": "npm run build",
-    "example": "node example/index.js",
+    "example": "npm run build; node example/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

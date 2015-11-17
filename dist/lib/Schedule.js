@@ -72,6 +72,21 @@ var Schedule = (function (_Queue) {
       var value = JSON.stringify({ key: key, value: this.encodeValue(data) });
       return this.redis.zrem(this.key, value);
     }
+
+    /*
+    * Tells if the job is scheduled.
+    */
+
+  }, {
+    key: 'isEnqueued',
+    value: function isEnqueued(data) {
+      var at = data.at || Date.now();
+      var key = typeof data.queue === 'string' ? data.queue : data.queue.key;
+      var value = JSON.stringify({ key: key, value: this.encodeValue(data) });
+      return this.redis.zscore(this.key, value).then(function (res) {
+        return !!res;
+      });
+    }
   }]);
 
   return Schedule;
