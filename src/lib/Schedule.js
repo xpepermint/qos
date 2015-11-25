@@ -54,10 +54,8 @@ class Schedule extends Queue {
   toggle(data, shouldEnqueue) {
     let perform = (shouldEnqueue) => {
       if (shouldEnqueue) {
-        console.log('yes')
         return this.enqueue(data);
       } else {
-        console.log('no')
         return this.dequeue(data);
       }
     };
