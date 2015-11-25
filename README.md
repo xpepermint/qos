@@ -14,7 +14,7 @@ $ npm install --save qos
 
 ## Usage
 
-Before we start make sure you have Redis server up and running.
+Before we start make sure you have `Redis` server up and running.
 
 ### Queue
 
@@ -33,12 +33,12 @@ Create a new file `./index.js` and define a simple queue. We need to pass an ins
 'use strict';
 
 // initializing Redis connection
-var Redis = require('ioredis');
-var redis = new Redis();
+const Redis = require('ioredis');
+const redis = new Redis();
 
 // initializing queue named `myqueue`
-var qos = require('qos');
-var queue = new qos.Queue(redis, 'myqueue');
+const qos = require('qos');
+let queue = new qos.Queue(redis, 'myqueue');
 
 // starting queue
 queue.start();
@@ -47,7 +47,7 @@ queue.start();
 Now we are ready to enqueue a job using the `enqueue` command. The job execution will start immediately.
 
 ```js
-var path = require('path');
+const path = require('path');
 
 queue.enqueue({
   path: path.join(__dirname, 'MyJob'),
@@ -76,22 +76,22 @@ queue.perform({
 I bet you'll put your jobs in one place. Building a job path over and over again soon gets pretty annoying. Queue will look for jobs inside application's working directory by default (`process.cwd()`). We can override the that by passing the `paths` options.
 
 ```js
-var paths = [__dirname, `${__dirname}/jobs`]; // list of paths where jobs can exist
-var queue = new qos.Queue(redis, 'myqueue', {paths});
+let paths = [__dirname, `${__dirname}/jobs`]; // list of paths where jobs can exist
+let queue = new qos.Queue(redis, 'myqueue', {paths});
 ```
 
 Jobs run within the `Queue` class context which means that we can access Queue instance methods through `this` keyword. We can change jobs' context by passing the `ctx` options.
 
 ```js
-var ctx = new FakeContext();
-var queue = new qos.Queue(redis, 'myqueue', {ctx});
+const ctx = new FakeContext();
+const queue = new qos.Queue(redis, 'myqueue', {ctx});
 ```
 
 Changing the context is not recommended. It's better to use the `args` options which expects an array of arguments that will be merged with job arguments.
 
 ```js
-var ctx = new FakeContext();
-var queue = new qos.Queue(redis, 'myqueue', {args: [ctx]});
+let ctx = new FakeContext();
+let queue = new qos.Queue(redis, 'myqueue', {args: [ctx]});
 ```
 
 ### Schedule
@@ -101,7 +101,7 @@ To schedule a job at a particular time in the future we need to use the `Schedul
 Let's open our `./index.js` file which we defined earlier and add our scheduler queue.
 
 ```js
-var schedule = new qos.Schedule(redis, 'myschedule'); // no options
+let schedule = new qos.Schedule(redis, 'myschedule'); // no options
 
 schedule.start();
 ```
@@ -137,6 +137,18 @@ schedule.isEnqueued({
   args: ['argument1', 'argument2'],
   queue
 }); // returns a Promise
+```
+
+There is also a `toggle` command which enqueues/dequeues a job based on an optional condition.
+
+```js
+let condition = 1 > 0;
+schedule.toggle({
+  path: 'MyJob',
+  args: ['argument1', 'argument2'],
+  queue, // you can also pass queue name ('myqueue')
+  at: Date.now() + 10000
+}, condition); // returns a Promise
 ```
 
 ## Example

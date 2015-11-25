@@ -23,4 +23,4 @@ var schedule = new qos.Schedule(redis, 'qos:schedule');
 // starting schedule queue
 schedule.start();
 // delay job for 10s
-schedule.enqueue({queue, at: Date.now()+10000, path: 'jobs/MyJob', args: [Date.now()]});
+schedule.toggle({queue, at: Date.now()+10000, path: 'jobs/MyJob', args: [Date.now()]});
