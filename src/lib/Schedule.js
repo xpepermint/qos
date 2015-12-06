@@ -33,7 +33,7 @@ class Schedule extends Queue {
   enqueue(data) {
     let at = data.at || Date.now();
     let key = typeof data.queue === 'string' ? data.queue : data.queue.key;
-    let value = JSON.stringify({key, value: this.encodeValue(data)});
+    let value = this.encodeValue({key, value: this.encodeValue(data.data)});
     return this.redis.zadd(this.key, at, value);
   }
 
@@ -43,7 +43,7 @@ class Schedule extends Queue {
 
   dequeue(data) {
     let key = typeof data.queue === 'string' ? data.queue : data.queue.key;
-    let value = JSON.stringify({key, value: this.encodeValue(data)});
+    let value = this.encodeValue({key, value: this.encodeValue(data.data)});
     return this.redis.zrem(this.key, value);
   }
 
@@ -73,7 +73,7 @@ class Schedule extends Queue {
   isEnqueued(data) {
     let at = data.at || Date.now();
     let key = typeof data.queue === 'string' ? data.queue : data.queue.key;
-    let value = JSON.stringify({key, value: this.encodeValue(data)});
+    let value = JSON.stringify({key, value: this.encodeValue(data.data)});
     return this.redis.zscore(this.key, value).then(res => !!res);
   }
 }

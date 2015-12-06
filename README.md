@@ -18,114 +18,79 @@ Before we start make sure you have `Redis` server up and running.
 
 ### Queue
 
-Let's start by creating a `job` file `./MyJob.js`. A job module must return a function which returns a promise.
+Let's create a new file `./index.js` and define a simple queue.
 
 ```js
-module.exports = function(arg) {
-  console.log(`Processing job MyJob with argument ${arg}.`);
-  return Promise.resolve();
-};
-```
+import Redis from 'ioredis';
+import qos from 'qos';
 
-Create a new file `./index.js` and define a simple queue. We need to pass an instance of a Redis connection to the `Queue` class. This package should work with any Redis library that supports promises. We'll use an awesome [ioredis](https://github.com/luin/ioredis) package.
-
-```js
-'use strict';
-
-// initializing Redis connection
-const Redis = require('ioredis');
+// initializing redis instance
 const redis = new Redis();
 
+// initializing handler for processing jobs
+const handler = data => {
+  console.log(`Handling job named ${data.name}`);
+};
+
 // initializing queue named `myqueue`
-const qos = require('qos');
-let queue = new qos.Queue(redis, 'myqueue');
+const queue = new qos.Queue(redis, 'myqueue', handler);
 
 // starting queue
 queue.start();
 ```
 
-Now we are ready to enqueue a job using the `enqueue` command. The job execution will start immediately.
+First we need to pass an instance of a Redis connection to the `Queue` class. QoS should work with any Redis library that supports promises. The second argument is the name of the queue. The last argument is a function for processing jobs.
+
+We are now ready to enqueue a job using the `enqueue` command.
 
 ```js
-const path = require('path');
-
-queue.enqueue({
-  path: path.join(__dirname, 'MyJob'),
-  args: ['argument1']
-}); // returns a Promise
+queue.enqueue({name: 'JobName'}); // returns a Promise
 ```
 
-We can also remove a job using the `dequeue` command. Well, the processing is so fast that we will probably miss that chance :).
+The `enqueue` command is actually a call to the handler. It accepts an argument which is passed directly to the `handler`.
+
+We can also remove a job using the `dequeue` command.
 
 ```js
-queue.dequeue({
-  path: path.join(__dirname, 'MyJob'),
-  args: ['argument1']
-}); // returns a Promise
+queue.dequeue({name: 'JobName'}); // returns a Promise
 ```
 
 Jobs can also be executed without touching the queuing system using the `perform` method.
 
 ```js
-queue.perform({
-  path: path.join(__dirname, 'MyJob'),
-  args: ['argument1']
-}); // returns a Promise
-```
-
-I bet you'll put your jobs in one place. Building a job path over and over again soon gets pretty annoying. Queue will look for jobs inside application's working directory by default (`process.cwd()`). We can override the that by passing the `paths` options.
-
-```js
-let paths = [__dirname, `${__dirname}/jobs`]; // list of paths where jobs can exist
-let queue = new qos.Queue(redis, 'myqueue', {paths});
-```
-
-Jobs run within the `Queue` class context which means that we can access Queue instance methods through `this` keyword. We can change jobs' context by passing the `ctx` options.
-
-```js
-const ctx = new FakeContext();
-const queue = new qos.Queue(redis, 'myqueue', {ctx});
-```
-
-Changing the context is not recommended. It's better to use the `args` options which expects an array of arguments that will be merged with job arguments.
-
-```js
-let ctx = new FakeContext();
-let queue = new qos.Queue(redis, 'myqueue', {args: [ctx]});
+queue.perform({name: 'JobName'}); // returns a Promise
 ```
 
 ### Schedule
 
 To schedule a job at a particular time in the future we need to use the `Schedule` class. `Schedule` is an extended `Queue` class. It has pretty much the same logic. The main difference is that we need to provide some additional information for the `enqueue` and `dequeue` commands.
 
-Let's open our `./index.js` file which we defined earlier and add our scheduler queue.
+Let's open our `./index.js` file which we defined earlier and add a scheduler.
 
 ```js
-let schedule = new qos.Schedule(redis, 'myschedule'); // no options
+let schedule = new qos.Schedule(redis, 'myschedule');
 
 schedule.start();
 ```
 
-Schedule the `MyJob` with the delay of 10s.
+Schedule a job with the delay of 10s.
 
 ```js
 schedule.enqueue({
-  path: 'MyJob',
-  args: ['argument1', 'argument2'],
-  queue, // you can also pass queue name ('myqueue')
-  at: Date.now() + 10000
+  queue, // you can also pass queue name (e.g. 'myqueue')
+  at: Date.now() + 10000,
+  data: {name: 'JobName'} // Queue job data
 }); // returns a Promise
 ```
 
-There is one important different between `Queue` and `Schedule` classes. If we call the command above multiple times, an existing job will always be replaced with a new one. This means that two identical jobs can not exist in scheduled queue. This is great and ensures that the same job will never accidentally be scheduled twice.
+There is one important different between `Queue` and `Schedule` classes. If we call the command above multiple times, an existing job will be replaced with a new one. This means that two identical jobs can not exist in scheduled queue. This is great and ensures that the same job will never accidentally be scheduled twice.
 
 Scheduled jobs can also be removed.
 
 ```js
 schedule.dequeue({
-  path: 'MyJob',
-  args: ['argument1', 'argument2'],
-  queue
+  queue,
+  data: {name: 'JobName'}
 }); // returns a Promise
 ```
 
@@ -133,9 +98,8 @@ We can also check if the job is schedule by using the `isEnqueued` command.
 
 ```js
 schedule.isEnqueued({
-  path: 'MyJob',
-  args: ['argument1', 'argument2'],
-  queue
+  queue,
+  data: {name: 'JobName'}
 }); // returns a Promise
 ```
 
@@ -144,10 +108,9 @@ There is also a `toggle` command which enqueues/dequeues a job based on an optio
 ```js
 let condition = 1 > 0;
 schedule.toggle({
-  path: 'MyJob',
-  args: ['argument1', 'argument2'],
-  queue, // you can also pass queue name ('myqueue')
-  at: Date.now() + 10000
+  queue,
+  at: Date.now() + 10000,
+  data: {name: 'JobName'}
 }, condition); // returns a Promise
 ```
 

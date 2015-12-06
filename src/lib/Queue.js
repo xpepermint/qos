@@ -1,23 +1,20 @@
 'use strict';
 
-const path = require('path');
 const QueueEmptyError = require('./errors/QueueEmptyError');
 
 class Queue {
 
   /*
-  * Class constructor with the required `key` parameter withc represents the
+  * Class constructor with the required `key` parameter which represents the
   * name of the list used by this schedule.
   */
 
-  constructor(redis, key, options) {
+  constructor(redis, key, handler) {
     this.redis = redis;
     this.key = key;
     this.running = false;
     this.timeout = null;
-    this.paths = options && options.paths ? options.paths : [process.cwd()];
-    this.ctx = options && options.ctx ? options.ctx : this;
-    this.args = options && options.args ? options.args : [];
+    this.handler = handler;
   }
 
   /*
@@ -73,9 +70,7 @@ class Queue {
   */
 
   encodeValue(data) {
-    let path = data.path;
-    let args = data.args;
-    return JSON.stringify({path, args});
+    return JSON.stringify(data);
   }
 
   /*
@@ -91,9 +86,7 @@ class Queue {
   */
 
   enqueue(data) {
-    let path = data.path;
-    let args = data.args;
-    let value = this.encodeValue({path, args});
+    let value = this.encodeValue(data);
     return this.redis.lpush(this.key, value);
   }
 
@@ -103,9 +96,7 @@ class Queue {
   */
 
   dequeue(data) {
-    let path = data.path;
-    let args = data.args;
-    let value = this.encodeValue({path, args});
+    let value = this.encodeValue(data);
     return this.redis.lrem(this.key, '-0', value);
   }
 
@@ -114,11 +105,7 @@ class Queue {
   */
 
   perform(data) {
-    let locs = this.paths.concat([data.path]);
-    let dest = path.resolve.apply(null, locs);
-    let ctx = this.ctx;
-    let args = (data.args||[]).concat(this.args);
-    return require.main.require(dest).apply(ctx, args);
+    return Promise.resolve().then(res => this.handler(data));
   }
 }
 
