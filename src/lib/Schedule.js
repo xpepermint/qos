@@ -3,7 +3,18 @@
 const Queue = require('./Queue');
 const QueueEmptyError = require('./errors/QueueEmptyError');
 
-class Schedule extends Queue {
+module.exports = class Schedule extends Queue {
+
+  /*
+  * Class constructor with the required `key` parameter which represents the
+  * name of the schedule.
+  */
+
+  constructor(redis, key, options) {
+    super(redis, key);
+    this.options = options || {};
+  }
+
 
   /*
   * Private method which is called on every heartbit of the schedule.
@@ -31,6 +42,10 @@ class Schedule extends Queue {
   */
 
   enqueue(data) {
+    if (!data.queue) {
+      data.queue = this.options.queue;
+    }
+
     let at = data.at || Date.now();
     let key = typeof data.queue === 'string' ? data.queue : data.queue.key;
     let value = this.encodeValue({key, value: this.encodeValue(data.data)});
@@ -42,9 +57,28 @@ class Schedule extends Queue {
   */
 
   dequeue(data) {
+    if (!data.queue) {
+      data.queue = this.options.queue;
+    }
+
     let key = typeof data.queue === 'string' ? data.queue : data.queue.key;
     let value = this.encodeValue({key, value: this.encodeValue(data.data)});
     return this.redis.zrem(this.key, value);
+  }
+
+  /*
+  * Tells if the job is scheduled.
+  */
+
+  isEnqueued(data) {
+    if (!data.queue) {
+      data.queue = this.options.queue;
+    }
+
+    let at = data.at || Date.now();
+    let key = typeof data.queue === 'string' ? data.queue : data.queue.key;
+    let value = JSON.stringify({key, value: this.encodeValue(data.data)});
+    return this.redis.zscore(this.key, value).then(res => !!res);
   }
 
   /*
@@ -65,17 +99,4 @@ class Schedule extends Queue {
       return perform(shouldEnqueue);
     }
   }
-
-  /*
-  * Tells if the job is scheduled.
-  */
-
-  isEnqueued(data) {
-    let at = data.at || Date.now();
-    let key = typeof data.queue === 'string' ? data.queue : data.queue.key;
-    let value = JSON.stringify({key, value: this.encodeValue(data.data)});
-    return this.redis.zscore(this.key, value).then(res => !!res);
-  }
 }
-
-module.exports = Schedule;

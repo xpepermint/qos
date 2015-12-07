@@ -68,7 +68,7 @@ To schedule a job at a particular time in the future we need to use the `Schedul
 Let's open our `./index.js` file which we defined earlier and add a scheduler.
 
 ```js
-let schedule = new qos.Schedule(redis, 'myschedule');
+let schedule = new qos.Schedule(redis, 'myschedule'); // you can set the default `queue` through options which is optional third parameter
 
 schedule.start();
 ```

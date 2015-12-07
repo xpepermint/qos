@@ -14,8 +14,8 @@ queue.start();
 queue.enqueue({name: 'MyJob'});
 
 // initializing schedule
-var schedule = new qos.Schedule(redis, 'qos:schedule');
+var schedule = new qos.Schedule(redis, 'qos:schedule', {queue});
 // starting schedule queue
 schedule.start();
 // delay job for 5s
-schedule.toggle({queue, at: Date.now()+5000, data: {name: 'MyJob'}});
+schedule.toggle({at: Date.now()+5000, data: {name: 'MyJob'}});

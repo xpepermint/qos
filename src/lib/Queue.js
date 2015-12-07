@@ -2,7 +2,7 @@
 
 const QueueEmptyError = require('./errors/QueueEmptyError');
 
-class Queue {
+module.exports = class Queue {
 
   /*
   * Class constructor with the required `key` parameter which represents the
@@ -108,5 +108,3 @@ class Queue {
     return Promise.resolve().then(res => this.handler(data));
   }
 }
-
-module.exports = Queue;
